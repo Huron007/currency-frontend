@@ -1,0 +1,12 @@
+package com.kodilla.currencyfrontend.client;
+
+public enum UrlCode {
+    SINGLE_CURRENCY_EXCHANGE_RATE,
+    UPDATE_CURRENCY_TABLE,
+    UPDATE_CRYPTO_CURRENCY_TABLE,
+    SINGLE_CURRENCY_LIST,
+    LATEST_CURRENCY_LIST,
+    LATEST_CRYPTO_CURRENCY_LIST,
+    ALERT,
+    FAVORITE
+}
