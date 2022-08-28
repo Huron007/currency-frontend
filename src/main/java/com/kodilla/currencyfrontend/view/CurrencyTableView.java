@@ -5,6 +5,7 @@ import com.kodilla.currencyfrontend.components.ComponentInitializer;
 import com.kodilla.currencyfrontend.domain.Currency;
 import com.kodilla.currencyfrontend.domain.CurrencyService;
 import com.kodilla.currencyfrontend.domain.FavoriteService;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -57,6 +58,24 @@ public class CurrencyTableView extends VerticalLayout {
 
     private void setGrid(Grid<Currency> gridToSet, boolean crypto){
         gridToSet.setColumns("code", "exchangeRate", "effectiveDate");
+        gridToSet.addColumn(
+                new ComponentRenderer<>(Button::new, (button, currency) -> {
+                    button.addThemeVariants(ButtonVariant.LUMO_ICON,
+                            ButtonVariant.LUMO_ERROR,
+                            ButtonVariant.LUMO_TERTIARY);
+                    button.addClickListener(e -> {
+                        if(!crypto){
+                            CurrencyDetailView.code = currency.getCode();
+                            CurrencyDetailView.listSetup(crypto);
+                            button.getUI().ifPresent(ui -> ui.navigate("currency/"+ currency.getCode() +"/details"));
+                        } else {
+                            CurrencyDetailView.code = currency.getName();
+                            CurrencyDetailView.listSetup(crypto);
+                            button.getUI().ifPresent(ui -> ui.navigate("currency/"+ currency.getName() +"/details"));
+                        }
+                    });
+                    button.setIcon(new Icon(VaadinIcon.INFO_CIRCLE));
+                })).setHeader("Check details");
         gridToSet.addColumn(
                 new ComponentRenderer<>(Button::new, (button, currency) -> {
                     button.addThemeVariants(ButtonVariant.LUMO_ICON,

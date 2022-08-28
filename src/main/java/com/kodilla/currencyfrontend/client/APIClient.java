@@ -1,6 +1,7 @@
 package com.kodilla.currencyfrontend.client;
 
 import com.kodilla.currencyfrontend.domain.Alert;
+import com.kodilla.currencyfrontend.domain.Code;
 import com.kodilla.currencyfrontend.domain.Currency;
 import org.springframework.http.HttpEntity;
 import org.springframework.stereotype.Component;
@@ -42,6 +43,11 @@ public class APIClient {
                         .toUri();
             case SINGLE_CURRENCY_LIST:
                 return UriComponentsBuilder.fromHttpUrl("http://localhost:8080/v1/currency/list/" + code)
+                        .build()
+                        .encode()
+                        .toUri();
+            case SINGLE_CRYPTO_CURRENCY_LIST:
+                return UriComponentsBuilder.fromHttpUrl("http://localhost:8080/v1/cryptoCurrency/list/" + code)
                         .build()
                         .encode()
                         .toUri();
@@ -102,6 +108,14 @@ public class APIClient {
         }
     }
 
+    public static List<Currency> getAllCryptoCurrenciesWithGivenCode(String code, boolean crypto){
+        try {
+            return converter.convertCurrencyResponseToCurrencyList(Objects.requireNonNull(restTemplate.getForObject(getUrl(code, UrlCode.SINGLE_CRYPTO_CURRENCY_LIST), Currency[].class)), crypto);
+        } catch (RestClientException e){
+            return Collections.emptyList();
+        }
+    }
+
     public static List<Currency> getFavoriteCurrencyList(){
         try{
             return converter.convertToFavoriteCurrencyList(Objects.requireNonNull(restTemplate.getForObject(getUrl(UrlCode.FAVORITE), Currency[].class)));
@@ -143,6 +157,38 @@ public class APIClient {
             return converter.convertToAlertList(Objects.requireNonNull(restTemplate.getForObject(getUrl(UrlCode.ALERT), Alert[].class)));
         } catch (RestClientException e){
             return Collections.emptyList();
+        }
+    }
+
+    public static void createAlert(Alert alert){
+        try {
+            restTemplate.postForObject(getUrl(UrlCode.ALERT), new HttpEntity<>(alert), Alert.class);
+        } catch (RestClientException e){
+            e.printStackTrace();
+        }
+    }
+
+    public static void deleteAlert(Alert alert){
+        URI url = UriComponentsBuilder.fromHttpUrl("http://localhost:8080/v1/alert/" + alert.getId())
+                .build()
+                .encode()
+                .toUri();
+        try {
+            restTemplate.delete(url);
+        } catch (RestClientException e){
+            e.printStackTrace();
+        }
+    }
+
+    public static Double calculate(String code1, String code2, Double value){
+        URI url = UriComponentsBuilder.fromHttpUrl("http://localhost:8080/v1/currency/calculate?code1=" + code1 + "&code2=" + code2 + "&value=" + value)
+                .build()
+                .encode()
+                .toUri();
+        try {
+            return Objects.requireNonNull(restTemplate.getForObject(url, Double.class));
+        } catch (RestClientException e){
+            return 1.0;
         }
     }
 

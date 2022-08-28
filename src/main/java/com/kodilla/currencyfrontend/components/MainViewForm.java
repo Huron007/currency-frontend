@@ -29,23 +29,26 @@ public class MainViewForm extends FormLayout {
         Button euroButton = new Button(euroImage);
         euroButton.addClickListener(
                 event -> {
-                    euroButton.getUI().ifPresent(ui -> ui.navigate("currency/EUR/details"));
                     CurrencyDetailView.code = "EUR";
+                    CurrencyDetailView.listSetup(false);
+                    euroButton.getUI().ifPresent(ui -> ui.navigate("currency/EUR/details"));
                 }
         );
         euroButton.setWidth("20px");
         Button usdButton = new Button(usdImage);
         usdButton.addClickListener(
                 event -> {
-                    usdButton.getUI().ifPresent(ui -> ui.navigate("currency/USD/details"));
                     CurrencyDetailView.code = "USD";
+                    CurrencyDetailView.listSetup(false);
+                    usdButton.getUI().ifPresent(ui -> ui.navigate("currency/USD/details"));
                 }
         );
         Button gbpButton = new Button(gbpImage);
         gbpButton.addClickListener(
                 event -> {
-                    gbpButton.getUI().ifPresent(ui -> ui.navigate("currency/GBP/details"));
                     CurrencyDetailView.code = "GBP";
+                    CurrencyDetailView.listSetup(false);
+                    gbpButton.getUI().ifPresent(ui -> ui.navigate("currency/GBP/details"));
                 }
         );
         add(euroName, usdName, gbpName, euroButton, euroValue, usdButton, usdValue, gbpButton, gbpValue);

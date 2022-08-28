@@ -1,18 +1,14 @@
 package com.kodilla.currencyfrontend.client;
 
 import com.kodilla.currencyfrontend.domain.Alert;
+import com.kodilla.currencyfrontend.domain.Code;
 import com.kodilla.currencyfrontend.domain.Currency;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class APIResponseConverter {
-
-//    public Currency singleCurrencyExchangeRate(String name, Double value){
-//        return new Currency(name, value, null);
-//    }
 
     public List<Currency> convertCurrencyResponseToCurrencyList(Currency[] lists, boolean crypto){
         List<Currency> list = new ArrayList<>();
@@ -90,29 +86,22 @@ public class APIResponseConverter {
 
     public List<Alert> convertToAlertList(Alert[] alerts){
         List<Alert> list = new ArrayList<>();
+        Code value;
+        String name;
         for (Alert alert : alerts) {
+            value = Code.findByName(alert.getCode());
+            name = value.toString();
+            name = name.replaceAll("_", " ");
             list.add(
                     new Alert(
                             alert.getId(),
-                            alert.getCode(),
+                            alert.getName(),
+                            name,
                             alert.getTrackedMargin(),
                             alert.isActive()
                     )
             );
         }
         return list;
-    }
-
-    public Currency convertToCurrencyAfterFavoriteCreation(Currency currency, boolean crypto){
-        List<Currency> list;
-        if(!crypto){
-            list = APIClient.getLatestCurrencyList(crypto);
-        } else {
-            list = APIClient.getLatestCryptoCurrencyList(crypto);
-        }
-        List<Currency> filteredList = list.stream().filter(e -> e.getCode()
-                        .equals(currency.getCode()))
-                        .collect(Collectors.toList());
-        return filteredList.get(0);
     }
 }

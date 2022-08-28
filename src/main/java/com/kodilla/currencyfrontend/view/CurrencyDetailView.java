@@ -2,6 +2,7 @@ package com.kodilla.currencyfrontend.view;
 
 import com.kodilla.currencyfrontend.client.APIClient;
 import com.kodilla.currencyfrontend.components.ComponentInitializer;
+import com.kodilla.currencyfrontend.domain.Code;
 import com.kodilla.currencyfrontend.domain.Currency;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.charts.Chart;
@@ -19,22 +20,26 @@ import java.util.stream.Collectors;
 public class CurrencyDetailView extends VerticalLayout implements BeforeEnterObserver {
 
     public static String code;
+    private static List<Currency> list;
 
     public CurrencyDetailView() {
         ComponentInitializer componentInitializer = new ComponentInitializer(this);
-        List<Currency> list = APIClient.getAllCurrenciesWithGivenCode(code, false);
-        list = list.stream().sorted(Comparator.comparing(Currency::getExchangeRate)).limit(30).collect(Collectors.toList());
+        list = list.stream().sorted(Comparator.comparing(Currency::getExchangeRate)).limit(20).collect(Collectors.toList());
 
         Chart chart = new Chart(ChartType.AREA);
 
         final Configuration configuration = chart.getConfiguration();
 
-        configuration.setTitle("Exchange rate of " + code + " in last " + list.size() + " exchange rate updates.");
+        Code name = Code.findByName(code);
+        assert name != null;
+        String currencyName = name.toString();
+        currencyName = currencyName.replaceAll("_", " ");
+        configuration.setTitle("Exchange rate of " + currencyName + " in last " + list.size() + " exchange rate updates.");
 
         XAxis xAxis = configuration.getxAxis();
-        String[] dateList = new String[30];
-        Double[] exchangeRateList = new Double[30];
-        list = list.stream().sorted(Comparator.comparing(Currency::getEffectiveDate)).limit(30).collect(Collectors.toList());
+        String[] dateList = new String[list.size()];
+        Double[] exchangeRateList = new Double[list.size()];
+        list = list.stream().sorted(Comparator.comparing(Currency::getEffectiveDate)).limit(20).collect(Collectors.toList());
         for(int i = 0; i < list.size(); i++){
             dateList[i] = list.get(i).getEffectiveDate().toString();
             exchangeRateList[i] = list.get(i).getExchangeRate();
@@ -54,6 +59,14 @@ public class CurrencyDetailView extends VerticalLayout implements BeforeEnterObs
         configuration.addSeries(new ListSeries(code, exchangeRateList));
 
         add(chart);
+    }
+
+    public static void listSetup(boolean crypto){
+        if(!crypto){
+            list = APIClient.getAllCurrenciesWithGivenCode(code, crypto);
+        } else {
+            list = APIClient.getAllCryptoCurrenciesWithGivenCode(code, crypto);
+        }
     }
 
     @Override
